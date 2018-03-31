@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -20,22 +19,6 @@ import java.sql.Statement;
 public class DBUtils {
     
     private static Connection dbConnection;
-
-    public static void main(String[] args) throws SQLException {
-	dbConnection = DriverManager.getConnection("jdbc:h2:./phildbtest","sa","");
-	Statement stmt = dbConnection.createStatement();
-	//stmt.execute("CREATE TABLE demotable (id INTEGER NOT NULL, lastname VARCHAR(128), firstname VARCHAR(128), username VARCHAR(128) )");
-	//stmt.executeUpdate("INSERT INTO demotable VALUES(1, 'Hassialis', 'Philip Alexander', 'fhasial') ");
-	//stmt.executeUpdate("INSERT INTO demotable VALUES(2, '', '', 'Admin') ");
-	stmt.execute("delete from demotable where username='fameliarisa'");
-	stmt.execute("SELECT * FROM demotable");
-	
-	ResultSet rs = stmt.getResultSet();
-	while (rs.next()) {
-	    System.out.println(rs.getString("username"));
-	}
-	
-    }
     
     public static Statement executeQuery(String query) throws SQLException {
 	Statement res = dbConnection.createStatement();
