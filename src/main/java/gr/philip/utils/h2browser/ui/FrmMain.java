@@ -6,7 +6,10 @@
 package gr.philip.utils.h2browser.ui;
 
 import gr.philip.utils.h2browser.utils.DBUtils;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.HeadlessException;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
@@ -17,6 +20,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 /**
  *
@@ -41,10 +51,10 @@ public class FrmMain extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jtxtareaSQL = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         jtxtareaResults = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jtextpaneSQL = new javax.swing.JTextPane();
         jPanel1 = new javax.swing.JPanel();
         jlblStatus = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -62,22 +72,22 @@ public class FrmMain extends javax.swing.JFrame {
         jSplitPane1.setDividerLocation(200);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jtxtareaSQL.setColumns(20);
-        jtxtareaSQL.setRows(5);
-        jtxtareaSQL.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jtxtareaSQLKeyPressed(evt);
-            }
-        });
-        jScrollPane1.setViewportView(jtxtareaSQL);
-
-        jSplitPane1.setTopComponent(jScrollPane1);
-
         jtxtareaResults.setColumns(20);
+        jtxtareaResults.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
         jtxtareaResults.setRows(5);
         jScrollPane2.setViewportView(jtxtareaResults);
 
         jSplitPane1.setRightComponent(jScrollPane2);
+
+        jtextpaneSQL.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
+        jtextpaneSQL.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jtextpaneSQLKeyPressed(evt);
+            }
+        });
+        jScrollPane3.setViewportView(jtextpaneSQL);
+
+        jSplitPane1.setLeftComponent(jScrollPane3);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -131,6 +141,11 @@ public class FrmMain extends javax.swing.JFrame {
 
         jmnuHelpAbout.setMnemonic('b');
         jmnuHelpAbout.setText("About...");
+        jmnuHelpAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmnuHelpAboutActionPerformed(evt);
+            }
+        });
         jMenu2.add(jmnuHelpAbout);
 
         jMenuBar1.add(jMenu2);
@@ -173,11 +188,46 @@ public class FrmMain extends javax.swing.JFrame {
 	}
     }//GEN-LAST:event_jmnuFileOpenActionPerformed
 
-    private void jtxtareaSQLKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtxtareaSQLKeyPressed
+    private void jmnuFileExportTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmnuFileExportTextActionPerformed
+	JFileChooser jfcSave = new JFileChooser(new File("."));
+	if (jfcSave.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+	    try {
+		try (FileWriter fw = new FileWriter(jfcSave.getSelectedFile(), true)) {
+		    fw.append(jtxtareaResults.getText());
+		    fw.flush();
+		}
+		JOptionPane.showMessageDialog(this, "Text Export succesful", "Text export", JOptionPane.INFORMATION_MESSAGE);
+	    } catch (IOException e) {
+		JOptionPane.showMessageDialog(this, "Text Export failed:" + e.getMessage(), "Text export", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+    }//GEN-LAST:event_jmnuFileExportTextActionPerformed
+
+    private void jmnuHelpAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmnuHelpAboutActionPerformed
 	// TODO add your handling code here:
+	FrmAbout njf = new FrmAbout();
+	njf.setVisible(true);
+	
+    }//GEN-LAST:event_jmnuHelpAboutActionPerformed
+
+    private void jtextpaneSQLKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtextpaneSQLKeyPressed
+	// TODO add syntax highlighting
+	/*
+	
+	try {
+	    SimpleAttributeSet set = new SimpleAttributeSet();
+	    StyleConstants.setForeground(set, Color.red);
+	    DefaultStyledDocument doc = (DefaultStyledDocument)jtextpaneSQL.getDocument();
+	    doc.setCharacterAttributes(0, 5, set, true);
+	} catch (Exception e) {
+	}
+	
+	*/
+	
+	
 	if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.getModifiers() == KeyEvent.CTRL_MASK) {
 	    try {
-		Statement s = DBUtils.executeQuery(jtxtareaSQL.getText());
+		Statement s = DBUtils.executeQuery(jtextpaneSQL.getText());
 		if (s != null) {
 		    ResultSet rs = s.getResultSet();
 		    jtxtareaResults.setText("");
@@ -207,25 +257,8 @@ public class FrmMain extends javax.swing.JFrame {
 		e.printStackTrace(System.err);
 
 	    }
-
 	}
-
-    }//GEN-LAST:event_jtxtareaSQLKeyPressed
-
-    private void jmnuFileExportTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmnuFileExportTextActionPerformed
-	JFileChooser jfcSave = new JFileChooser(new File("."));
-	if (jfcSave.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-	    try {
-		try (FileWriter fw = new FileWriter(jfcSave.getSelectedFile(), true)) {
-		    fw.append(jtxtareaResults.getText());
-		    fw.flush();
-		}
-		JOptionPane.showMessageDialog(this, "Text Export succesful", "Text export", JOptionPane.INFORMATION_MESSAGE);
-	    } catch (IOException e) {
-		JOptionPane.showMessageDialog(this, "Text Export failed:" + e.getMessage(), "Text export", JOptionPane.ERROR_MESSAGE);
-	    }
-	}
-    }//GEN-LAST:event_jmnuFileExportTextActionPerformed
+    }//GEN-LAST:event_jtextpaneSQLKeyPressed
 
     /**
      * @param args the command line arguments
@@ -266,8 +299,8 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel jlblStatus;
@@ -276,7 +309,7 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem jmnuFileExportText;
     private javax.swing.JMenuItem jmnuFileOpen;
     private javax.swing.JMenuItem jmnuHelpAbout;
+    private javax.swing.JTextPane jtextpaneSQL;
     private javax.swing.JTextArea jtxtareaResults;
-    private javax.swing.JTextArea jtxtareaSQL;
     // End of variables declaration//GEN-END:variables
 }
