@@ -166,6 +166,7 @@ public class FrmMain extends javax.swing.JFrame {
 		DBUtils.openConnection(jfc.getSelectedFile());
 		JOptionPane.showMessageDialog(this, "Opened database", "DB Open", JOptionPane.INFORMATION_MESSAGE);
 	    } catch (HeadlessException | IOException | ClassNotFoundException | SQLException e) {
+		JOptionPane.showMessageDialog(this, "SQL DB File Open failed:" + e.getMessage(), "File Open", JOptionPane.ERROR_MESSAGE);
 		e.printStackTrace(System.err);
 	    }
 	}
@@ -182,14 +183,18 @@ public class FrmMain extends javax.swing.JFrame {
 		    ResultSetMetaData rsmd = rs.getMetaData();
 		    StringBuilder sb = new StringBuilder();
 		    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-			    sb.append(rsmd.getColumnLabel(i));
-			    if (i < rsmd.getColumnCount()) sb.append(";");			    
+			sb.append(rsmd.getColumnLabel(i));
+			if (i < rsmd.getColumnCount()) {
+			    sb.append(";");
+			}
 		    }
 		    sb.append("\n");
 		    while (rs.next()) {
 			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 			    sb.append(rs.getString(i));
-			    if (i < rsmd.getColumnCount()) sb.append(";");
+			    if (i < rsmd.getColumnCount()) {
+				sb.append(";");
+			    }
 			}
 			sb.append("\n");
 		    }
@@ -197,6 +202,7 @@ public class FrmMain extends javax.swing.JFrame {
 		}
 
 	    } catch (SQLException e) {
+		JOptionPane.showMessageDialog(this, "SQL Execution failed:" + e.getMessage(), "SQL Exec", JOptionPane.ERROR_MESSAGE);
 		e.printStackTrace(System.err);
 
 	    }
@@ -207,22 +213,17 @@ public class FrmMain extends javax.swing.JFrame {
 
     private void jmnuFileExportTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmnuFileExportTextActionPerformed
 	JFileChooser jfcSave = new JFileChooser(new File("."));
-	if (jfcSave.showSaveDialog(this)==JFileChooser.APPROVE_OPTION) {
+	if (jfcSave.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    try {
-		try (FileWriter fw = new FileWriter(jfcSave.getSelectedFile(),true)) {
+		try (FileWriter fw = new FileWriter(jfcSave.getSelectedFile(), true)) {
 		    fw.append(jtxtareaResults.getText());
 		    fw.flush();
 		}
-		JOptionPane.showMessageDialog(this, "Text Export succesful","Text export", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Text Export succesful", "Text export", JOptionPane.INFORMATION_MESSAGE);
 	    } catch (IOException e) {
-		JOptionPane.showMessageDialog(this, "Text Export failed","Text export", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Text Export failed:" + e.getMessage(), "Text export", JOptionPane.ERROR_MESSAGE);
 	    }
-	    
-	    
 	}
-	
-	
-	
     }//GEN-LAST:event_jmnuFileExportTextActionPerformed
 
     /**
