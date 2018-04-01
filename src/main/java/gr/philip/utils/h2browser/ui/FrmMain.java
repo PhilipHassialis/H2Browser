@@ -9,6 +9,7 @@ import gr.philip.utils.h2browser.utils.DBUtils;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -16,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -50,6 +50,7 @@ public class FrmMain extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jmnuFile = new javax.swing.JMenu();
         jmnuFileOpen = new javax.swing.JMenuItem();
+        jmnuFileExportText = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jmnuFileExit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
@@ -103,6 +104,15 @@ public class FrmMain extends javax.swing.JFrame {
             }
         });
         jmnuFile.add(jmnuFileOpen);
+
+        jmnuFileExportText.setMnemonic('t');
+        jmnuFileExportText.setText("Text Export...");
+        jmnuFileExportText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmnuFileExportTextActionPerformed(evt);
+            }
+        });
+        jmnuFile.add(jmnuFileExportText);
         jmnuFile.add(jSeparator1);
 
         jmnuFileExit.setMnemonic('x');
@@ -195,6 +205,26 @@ public class FrmMain extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jtxtareaSQLKeyPressed
 
+    private void jmnuFileExportTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmnuFileExportTextActionPerformed
+	JFileChooser jfcSave = new JFileChooser(new File("."));
+	if (jfcSave.showSaveDialog(this)==JFileChooser.APPROVE_OPTION) {
+	    try {
+		try (FileWriter fw = new FileWriter(jfcSave.getSelectedFile(),true)) {
+		    fw.append(jtxtareaResults.getText());
+		    fw.flush();
+		}
+		JOptionPane.showMessageDialog(this, "Text Export succesful","Text export", JOptionPane.INFORMATION_MESSAGE);
+	    } catch (IOException e) {
+		JOptionPane.showMessageDialog(this, "Text Export failed","Text export", JOptionPane.ERROR_MESSAGE);
+	    }
+	    
+	    
+	}
+	
+	
+	
+    }//GEN-LAST:event_jmnuFileExportTextActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -241,6 +271,7 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JLabel jlblStatus;
     private javax.swing.JMenu jmnuFile;
     private javax.swing.JMenuItem jmnuFileExit;
+    private javax.swing.JMenuItem jmnuFileExportText;
     private javax.swing.JMenuItem jmnuFileOpen;
     private javax.swing.JMenuItem jmnuHelpAbout;
     private javax.swing.JTextArea jtxtareaResults;
